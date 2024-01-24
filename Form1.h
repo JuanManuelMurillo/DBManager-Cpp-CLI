@@ -58,14 +58,6 @@ namespace CppCLRWinFormsProject {
 	private: System::Windows::Forms::Button^ helpButton;
 	private: System::Windows::Forms::GroupBox^ groupBox6;
 
-
-
-
-
-
-
-
-
 		   bool logIn;
 
 	public:
@@ -88,9 +80,6 @@ namespace CppCLRWinFormsProject {
 				delete components;
 			}
 		}
-	//private: String^ connectionString = connectionTB->Text->ToString();
-	//private: String^ connectionString = "datasource=localhost; username=root; password=password; database=ESR_DB";
-	//private: MySqlConnection^ conn = gcnew MySqlConnection(connectionString);
 	private: System::Windows::Forms::Label^ lbUsuario;
 	private: System::Windows::Forms::Label^ lbContrasenia;
 	private: System::Windows::Forms::TextBox^ tbUsuario;
@@ -186,7 +175,6 @@ namespace CppCLRWinFormsProject {
 		void fillColumns() {
 			if (! System::String::IsNullOrEmpty(cbTables->Text->ToString())) {
 				String^ table = cbTables->SelectedItem->ToString();
-				//String^ table = cbTables->Text->ToString();
 				String^ connectionString = comboBox2->Text->ToString();
 				MySqlConnection^ conn = gcnew MySqlConnection(connectionString);
 				conn->Open();
@@ -204,39 +192,18 @@ namespace CppCLRWinFormsProject {
 			}
 		}
 	protected:
-
 	protected:
-
-
-
-
-
 	private: System::Windows::Forms::Button^ botonIngreso;
-
-
 	private: System::Windows::Forms::GroupBox^ groupBox1;
-
 	private: System::Windows::Forms::Label^ lbErrorLogIn;
-
 	private: System::Windows::Forms::GroupBox^ groupBox2;
-
 	private: System::Windows::Forms::ListBox^ lbColumns;
 	private: System::Windows::Forms::ComboBox^ cbTables;
-
 	private: System::Windows::Forms::Button^ button1;
-
-
-
-
-
 	private: System::ComponentModel::IContainer^ components;
-
 	protected:
-
 	protected:
-
 	protected:
-
 	private:
 		/// <summary>
 		/// Required designer variable.
@@ -695,8 +662,6 @@ namespace CppCLRWinFormsProject {
 	}
 	private: System::Void label3_Click(System::Object^ sender, System::EventArgs^ e) {
 	}
-		   
-
 	private: System::Void botonIngreso_Click(System::Object^ sender, System::EventArgs^ e) {
 		std::string usuario = "usuario";
 		std::string contrasenia = "contraseña";
@@ -769,9 +734,6 @@ private: System::Void bAceptar_Click(System::Object^ sender, System::EventArgs^ 
 			cambiosLabel->Text = "SIN CAMBIOS";
 			cambiosLabel->ForeColor = Color::Black;
 		}
-		
-		
-		
 	}
 }
 private: System::Void label1_Click(System::Object^ sender, System::EventArgs^ e) {
@@ -789,14 +751,9 @@ private: System::Void bClearDBView_Click(System::Object^ sender, System::EventAr
 	
 }
 private: System::Void textBox1_TextChanged(System::Object^ sender, System::EventArgs^ e) {
-	
-	
-	
-	//dataTable->DefaultView->RowFilter = System::String::Format("[{0}] LIKE '%{1}%'", columnas[0]->ColumnName, textBox1->Text);
 }
 private: System::Void label1_Click_1(System::Object^ sender, System::EventArgs^ e) {
 }
-
 private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e) {
 	if (! dataChanged) {
 		textBox1->Text = "";
@@ -811,8 +768,6 @@ private: System::Void ConnectDBButton_Click(System::Object^ sender, System::Even
 	if (logIn) {
 		connectDataBase();
 	}
-	
-	
 }
 private: System::Void button3_Click(System::Object^ sender, System::EventArgs^ e) {
 	fillColumns();
@@ -826,7 +781,6 @@ private: System::Void DBView_CellValueChanged(System::Object^ sender, System::Wi
 	dataChanged = true;
 	cambiosLabel->Text = "CAMBIOS SIN GUARDAR";
 	cambiosLabel->ForeColor = Color::Red;
-	
 }
 private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
 	MySqlConnection^ conn = gcnew MySqlConnection(comboBox2->Text->ToString());
@@ -918,3 +872,6 @@ FIN
 Prometo no volver a hacer un código tan desordenado
 y con tantas faltas a las convenciones en mi vida.
 */
+
+
+//PRUEBA GITHUB
