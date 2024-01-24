@@ -3,6 +3,7 @@
 #include <tchar.h>
 #include <vcclr.h> 
 #include <vector>
+#include <array>
 namespace CppCLRWinFormsProject {
 
 	using namespace System;
@@ -22,6 +23,7 @@ namespace CppCLRWinFormsProject {
 	public ref class Form1 : public System::Windows::Forms::Form
 	{
 	public: 
+		List<array<List<String^>^>^>^ ALLrowsControlList = gcnew List<array<List<String^>^>^>();
 		System::String^ usuario = "usuario";
 		bool dataChanged;
 		bool ableToDelete;
@@ -34,9 +36,6 @@ namespace CppCLRWinFormsProject {
 	private: System::Windows::Forms::CheckedListBox^ cbConnection;
 	private: System::Windows::Forms::GroupBox^ groupBox5;
 	private: System::Windows::Forms::Button^ bClearDBView;
-
-
-
 
 	public:
 		System::String^ contrasenia = "contraseña";
@@ -57,14 +56,6 @@ namespace CppCLRWinFormsProject {
 	private: System::Windows::Forms::CheckBox^ editCheckBox;
 	private: System::Windows::Forms::Button^ helpButton;
 	private: System::Windows::Forms::GroupBox^ groupBox6;
-
-
-
-
-
-
-
-
 
 		   bool logIn;
 
@@ -868,6 +859,45 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 		//Si el numero de filas del DBView es mayor al de la tabla en la base de datos se llega a este punto
 		else if (DBView->Rows->Count > dataTableCopy->Rows->Count)
 		{
+			//Iteramos las filas añadidas
+			for (unsigned int i = 0; i < (DBView->Rows->Count - dataTableCopy->Rows->Count); i++) {
+				//Creamos el array en el que guardaremos la información de la tabla, columnas y datos a ingresar en el MySqlCommand
+				array<List<String^>^>^ addedRowControlArray = gcnew array<List<String^>^> {gcnew List<String^>(), gcnew List<String^>(), gcnew List<String^>()};
+				addedRowControlArray[0]->Add(cbTables->Text->ToString());
+				//Iteramos todas las columnas de la tabla
+				for (unsigned int j = 0; j < DBView->Columns->Count; j++) {
+					
+					//Si existe un valor en la fila, entonces añade la información de la fila al array de control
+					if (DBView->Rows[i + dataTableCopy->Rows->Count]->Cells[j]->Value != nullptr) {
+						DataGridViewColumn^ column = DBView->Columns[j];
+						MessageBox::Show("INSERT INTO " + cbTables->Text->ToString() + " ( " + column->Name->ToString() + " )" + " VALUES " + "( " + "'" + DBView->Rows[i + dataTableCopy->Rows->Count]->Cells[j]->Value + "'" + " )", "INFO", MessageBoxButtons::OK, MessageBoxIcon::Information);
+						addedRowControlArray[1]->Add(column->Name->ToString());
+						addedRowControlArray[2]->Add(DBView->Rows[i + dataTableCopy->Rows->Count]->Cells[j]->Value->ToString());
+						
+						/*Al iterar cada columna de la fila y hacer directamente el query por cada valor MySQL va a intentar llenar los otros campos con valores nulos,
+						por lo tanto para cada fila primero guardar todas las columnas
+						en una matriz en donde el primer indice sea la tabla en la que se está dando el cambio, el segundo sea otro array con los nombres de 
+						las columnas que se añadan los datos y en el tercer y último indice los valores a insertar.
+						Después, afuera del ciclo que itera las columnas pero dentro del que itera las filas crear el comando SQL e adentro de los comandos iterar la lista para las columnas y valores
+						*/
+						//MySqlCommand^ commmandAdd = gcnew MySqlCommand("INSERT INTO " + cbTables->Text->ToString() + "( " + column->Name->ToString() + " )" + " VALUES " + "( " + "'" + DBView->Rows[i + dataTableCopy->Rows->Count]->Cells[j]->Value + "'" + " )", conn);
+						//DBView->Rows[i]->Cells[j]->Style->BackColor = Color::LightGreen;
+						//commmandAdd->ExecuteNonQuery();
+					}
+				}
+				System::Text::StringBuilder^ columnNames = gcnew System::Text::StringBuilder();
+				System::Text::StringBuilder^ values = gcnew System::Text::StringBuilder();
+				for (unsigned int k = 0; k < addedRowControlArray[1]->Count; k++) {
+					columnNames->Append(addedRowControlArray[1][k]);
+					columnNames->Append(" , ");
+				}
+				for (unsigned int k = 0; k < addedRowControlArray[2]->Count; k++) {
+					values->Append(addedRowControlArray[2][k]);
+					values->Append(" , ");
+				}
+				MySqlCommand^ commmandAdd = gcnew MySqlCommand("INSERT INTO " + addedRowControlArray[0] + "( " + columnNames +" )" + " VALUES " + "( " + "'" + values + ","  + "'" + " )", conn);
+				commmandAdd->ExecuteNonQuery();
+			}
 			MessageBox::Show("Se añadieron filas", "INFO", MessageBoxButtons::OK, MessageBoxIcon::Information);
 		}
 
@@ -877,10 +907,12 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 		for (unsigned int i = 0; i < modifiedCells->Count; i++) {
 			DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Style->BackColor = Color::Red;
 		}
-		System::Windows::Forms::DialogResult result = MessageBox::Show("Error de MySQL: " + ex->Message + "\n" + "¿Desea descartar los cambios ? ", "Error / n ¿Desea descartar los cambios ? ", MessageBoxButtons::YesNo, MessageBoxIcon::Error);
+		System::Windows::Forms::DialogResult result = MessageBox::Show("Error de MySQL: " + ex->Message + "\n" + "¿Desea descartar los cambios ? ", "Error", MessageBoxButtons::YesNo, MessageBoxIcon::Error);
 		if (result == System::Windows::Forms::DialogResult::Yes) {
 			for (unsigned int i = 0; i < modifiedCells->Count; i++) {
 				DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Style->BackColor = Color::White;
+				cambiosLabel->Text = "SIN CAMBIOS";
+				cambiosLabel->ForeColor = Color::Black;
 			}
 			modifiedCells->Clear();
 		}
