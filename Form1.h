@@ -972,10 +972,64 @@ private: System::Void button3_Click_2(System::Object^ sender, System::EventArgs^
 	//Lógica para eliminar una fila de la base de datos al tenerla seleccionada
 	/*
 	Marcar la fila que el usuario seleccione
+		Iterar las filas seleccionadas para no delimitar a borrar solo una fila
 	Encontrar la columna de la llave primaria de esa tabla
+		Abrir la conexión a la base de datos
+		Obtener las llaves de la tabla
+		Buscar el índice de la columna en la que está la llave primaria
+		Seleccionar el valor de la celda de cada fila en la columna de la llave primaria
+		Mandar el comando DELETE a MySQL
 	Buscar el valor de la celda de la llave primaria en la fila seleccionada
 	mandar el MySqlCommand para eliminar el registro con la llave primaria
 	*/
+	
+	System::Windows::Forms::DialogResult confirmationDialog =  MessageBox::Show("¿Estás seguro de que quieres elimiar las filas seleccionadas?\n Hay " + DBView->SelectedRows->Count + " filas seleccionadas", "Confirmación", MessageBoxButtons::YesNo, MessageBoxIcon::Warning);
+	if (confirmationDialog == System::Windows::Forms::DialogResult::Yes) {
+		if (DBView->SelectedRows->Count > 0) {
+			List<DataGridViewRow^>^ ListOfSelectedRows = gcnew List<DataGridViewRow^>;
+			//Llenar la lista de filas seleccionadas
+			for (int i = 0; i < DBView->SelectedRows->Count; i++) {
+				ListOfSelectedRows->Add(DBView->SelectedRows[i]);
+				MySqlConnection^ conn = gcnew MySqlConnection(comboBox2->Text->ToString());
+				try {
+					//Abrir la conexión con MySQL
+					conn->Open();
+					cbConnection->SetItemChecked(0, true);
+					//Encontrar el índice de la llave primaria
+					MySqlCommand^ commandShowKeys = gcnew MySqlCommand("SHOW KEYS FROM " + cbTables->Text->ToString() + " WHERE Key_name = 'PRIMARY';", conn);
+					MySqlDataReader^ readerShowKeys = commandShowKeys->ExecuteReader();
+					UInt32 primaryKeyIndex;
+					while (readerShowKeys->Read()) {
+						//Mapear el resultado ya que MySQL inicia los índices en 1 y C++ en 0
+						primaryKeyIndex = safe_cast<UInt32>(readerShowKeys["Seq_in_index"]) - 1;
+					}
+					readerShowKeys->Close();
+					String^ toDeleteValue = DBView->SelectedRows[i]->Cells[primaryKeyIndex]->Value->ToString();
+					MySqlCommand^ deleteCommand = gcnew MySqlCommand("DELETE FROM " + cbTables->Text->ToString() + " WHERE " + DBView->Columns[primaryKeyIndex]->Name->ToString() + " = " + toDeleteValue, conn);
+					deleteCommand->ExecuteNonQuery();
+				}
+				catch (MySqlException^ ex) {
+					System::Windows::Forms::DialogResult result = MessageBox::Show("Error de MySQL: " + ex->Message + "\n" + "¿Desea descartar los cambios ? ", "Error", MessageBoxButtons::YesNo, MessageBoxIcon::Error);
+					if (result == System::Windows::Forms::DialogResult::Yes) {
+						for (unsigned int i = 0; i < modifiedCells->Count; i++) {
+							DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Style->BackColor = Color::White;
+							cambiosLabel->Text = "SIN CAMBIOS";
+							cambiosLabel->ForeColor = Color::Black;
+						}
+						modifiedCells->Clear();
+					}
+				}
+				catch (Exception^ ex) {
+					MessageBox::Show("Error: " + ex->Message, "Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
+				}
+				finally {
+					conn->Close();
+				}
+			}
+			
+		}
+	}
+
 }
 };
 
