@@ -873,29 +873,43 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 						MessageBox::Show("INSERT INTO " + cbTables->Text->ToString() + " ( " + column->Name->ToString() + " )" + " VALUES " + "( " + "'" + DBView->Rows[i + dataTableCopy->Rows->Count]->Cells[j]->Value + "'" + " )", "INFO", MessageBoxButtons::OK, MessageBoxIcon::Information);
 						addedRowControlArray[1]->Add(column->Name->ToString());
 						addedRowControlArray[2]->Add(DBView->Rows[i + dataTableCopy->Rows->Count]->Cells[j]->Value->ToString());
-						
-						/*Al iterar cada columna de la fila y hacer directamente el query por cada valor MySQL va a intentar llenar los otros campos con valores nulos,
-						por lo tanto para cada fila primero guardar todas las columnas
-						en una matriz en donde el primer indice sea la tabla en la que se está dando el cambio, el segundo sea otro array con los nombres de 
-						las columnas que se añadan los datos y en el tercer y último indice los valores a insertar.
-						Después, afuera del ciclo que itera las columnas pero dentro del que itera las filas crear el comando SQL e adentro de los comandos iterar la lista para las columnas y valores
-						*/
-						//MySqlCommand^ commmandAdd = gcnew MySqlCommand("INSERT INTO " + cbTables->Text->ToString() + "( " + column->Name->ToString() + " )" + " VALUES " + "( " + "'" + DBView->Rows[i + dataTableCopy->Rows->Count]->Cells[j]->Value + "'" + " )", conn);
-						//DBView->Rows[i]->Cells[j]->Style->BackColor = Color::LightGreen;
-						//commmandAdd->ExecuteNonQuery();
 					}
 				}
 				System::Text::StringBuilder^ columnNames = gcnew System::Text::StringBuilder();
 				System::Text::StringBuilder^ values = gcnew System::Text::StringBuilder();
 				for (unsigned int k = 0; k < addedRowControlArray[1]->Count; k++) {
-					columnNames->Append(addedRowControlArray[1][k]);
-					columnNames->Append(" , ");
+					if (k == 0) {
+						columnNames->Append(addedRowControlArray[1][k]);
+						columnNames->Append(" , ");
+					}
+					else if (k < (addedRowControlArray[1]->Count - 1)) {
+						columnNames->Append(addedRowControlArray[1][k]);
+						columnNames->Append(" , ");
+					}
+					else {
+						columnNames->Append(addedRowControlArray[1][k]);
+					}
+
+					// Construye la cadena de valores
+					if (k == 0) {
+						values->Append("'");
+						values->Append(addedRowControlArray[2][k]);
+						values->Append("', ");
+					}
+					else if (k < (addedRowControlArray[2]->Count - 1)) {
+						values->Append("'");
+						values->Append(addedRowControlArray[2][k]);
+						values->Append("', ");
+					}
+					else {
+						values->Append("'");
+						values->Append(addedRowControlArray[2][k]);
+						values->Append("'");
+					}
 				}
-				for (unsigned int k = 0; k < addedRowControlArray[2]->Count; k++) {
-					values->Append(addedRowControlArray[2][k]);
-					values->Append(" , ");
-				}
-				MySqlCommand^ commmandAdd = gcnew MySqlCommand("INSERT INTO " + addedRowControlArray[0] + "( " + columnNames +" )" + " VALUES " + "( " + "'" + values + ","  + "'" + " )", conn);
+				MessageBox::Show("MB antes del comando para columnas" + columnNames->ToString(), "INFO", MessageBoxButtons::OK, MessageBoxIcon::Information);
+				MessageBox::Show("MB antes del comando para valores" + values->ToString(), "INFO", MessageBoxButtons::OK, MessageBoxIcon::Information);
+				MySqlCommand^ commmandAdd = gcnew MySqlCommand("INSERT INTO " + addedRowControlArray[0][0]->ToString() + "( " + columnNames->ToString() + " )" + " VALUES " + "( "  + values->ToString()  + " )", conn);
 				commmandAdd->ExecuteNonQuery();
 			}
 			MessageBox::Show("Se añadieron filas", "INFO", MessageBoxButtons::OK, MessageBoxIcon::Information);
