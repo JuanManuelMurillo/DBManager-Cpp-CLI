@@ -56,6 +56,7 @@ namespace CppCLRWinFormsProject {
 	private: System::Windows::Forms::CheckBox^ editCheckBox;
 	private: System::Windows::Forms::Button^ helpButton;
 	private: System::Windows::Forms::GroupBox^ groupBox6;
+	private: System::Windows::Forms::Button^ button3;
 
 		   bool logIn;
 
@@ -241,7 +242,7 @@ namespace CppCLRWinFormsProject {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			System::Windows::Forms::DataGridViewCellStyle^ dataGridViewCellStyle5 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
+			System::Windows::Forms::DataGridViewCellStyle^ dataGridViewCellStyle2 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
 			this->lbUsuario = (gcnew System::Windows::Forms::Label());
 			this->lbContrasenia = (gcnew System::Windows::Forms::Label());
 			this->botonIngreso = (gcnew System::Windows::Forms::Button());
@@ -257,8 +258,6 @@ namespace CppCLRWinFormsProject {
 			this->button1 = (gcnew System::Windows::Forms::Button());
 			this->groupBox4 = (gcnew System::Windows::Forms::GroupBox());
 			this->helpButton = (gcnew System::Windows::Forms::Button());
-			this->editCheckBox = (gcnew System::Windows::Forms::CheckBox());
-			this->cambiosLabel = (gcnew System::Windows::Forms::Label());
 			this->groupBox5 = (gcnew System::Windows::Forms::GroupBox());
 			this->button2 = (gcnew System::Windows::Forms::Button());
 			this->comboBox1 = (gcnew System::Windows::Forms::ComboBox());
@@ -266,12 +265,15 @@ namespace CppCLRWinFormsProject {
 			this->bClearDBView = (gcnew System::Windows::Forms::Button());
 			this->bAceptar = (gcnew System::Windows::Forms::Button());
 			this->DBView = (gcnew System::Windows::Forms::DataGridView());
+			this->editCheckBox = (gcnew System::Windows::Forms::CheckBox());
+			this->cambiosLabel = (gcnew System::Windows::Forms::Label());
 			this->cbConnection = (gcnew System::Windows::Forms::CheckedListBox());
 			this->ConnectDBButton = (gcnew System::Windows::Forms::Button());
 			this->comboBox2 = (gcnew System::Windows::Forms::ComboBox());
 			this->groupBox3 = (gcnew System::Windows::Forms::GroupBox());
 			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->groupBox6 = (gcnew System::Windows::Forms::GroupBox());
+			this->button3 = (gcnew System::Windows::Forms::Button());
 			this->groupBox1->SuspendLayout();
 			this->groupBox2->SuspendLayout();
 			this->groupBox4->SuspendLayout();
@@ -442,6 +444,7 @@ namespace CppCLRWinFormsProject {
 			// 
 			// groupBox4
 			// 
+			this->groupBox4->Controls->Add(this->button3);
 			this->groupBox4->Controls->Add(this->helpButton);
 			this->groupBox4->Controls->Add(this->groupBox5);
 			this->groupBox4->Controls->Add(this->bClearDBView);
@@ -465,26 +468,6 @@ namespace CppCLRWinFormsProject {
 			this->helpButton->Text = L"\?";
 			this->helpButton->UseVisualStyleBackColor = true;
 			this->helpButton->Click += gcnew System::EventHandler(this, &Form1::button3_Click_1);
-			// 
-			// editCheckBox
-			// 
-			this->editCheckBox->AutoSize = true;
-			this->editCheckBox->Location = System::Drawing::Point(3, 17);
-			this->editCheckBox->Name = L"editCheckBox";
-			this->editCheckBox->Size = System::Drawing::Size(74, 20);
-			this->editCheckBox->TabIndex = 14;
-			this->editCheckBox->Text = L"Edición";
-			this->editCheckBox->UseVisualStyleBackColor = true;
-			this->editCheckBox->CheckedChanged += gcnew System::EventHandler(this, &Form1::checkBox1_CheckedChanged);
-			// 
-			// cambiosLabel
-			// 
-			this->cambiosLabel->AutoSize = true;
-			this->cambiosLabel->Location = System::Drawing::Point(0, 156);
-			this->cambiosLabel->Name = L"cambiosLabel";
-			this->cambiosLabel->Size = System::Drawing::Size(92, 16);
-			this->cambiosLabel->TabIndex = 13;
-			this->cambiosLabel->Text = L"SIN CAMBIOS";
 			// 
 			// groupBox5
 			// 
@@ -533,7 +516,7 @@ namespace CppCLRWinFormsProject {
 			// 
 			this->bClearDBView->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(128)), static_cast<System::Int32>(static_cast<System::Byte>(162)),
 				static_cast<System::Int32>(static_cast<System::Byte>(150)));
-			this->bClearDBView->Location = System::Drawing::Point(1532, 338);
+			this->bClearDBView->Location = System::Drawing::Point(1530, 267);
 			this->bClearDBView->Name = L"bClearDBView";
 			this->bClearDBView->Size = System::Drawing::Size(211, 101);
 			this->bClearDBView->TabIndex = 3;
@@ -561,15 +544,15 @@ namespace CppCLRWinFormsProject {
 				static_cast<System::Int32>(static_cast<System::Byte>(76)));
 			this->DBView->BorderStyle = System::Windows::Forms::BorderStyle::None;
 			this->DBView->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
-			dataGridViewCellStyle5->Alignment = System::Windows::Forms::DataGridViewContentAlignment::MiddleLeft;
-			dataGridViewCellStyle5->BackColor = System::Drawing::Color::White;
-			dataGridViewCellStyle5->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 7.8F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			dataGridViewCellStyle2->Alignment = System::Windows::Forms::DataGridViewContentAlignment::MiddleLeft;
+			dataGridViewCellStyle2->BackColor = System::Drawing::Color::White;
+			dataGridViewCellStyle2->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 7.8F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
-			dataGridViewCellStyle5->ForeColor = System::Drawing::SystemColors::ControlText;
-			dataGridViewCellStyle5->SelectionBackColor = System::Drawing::SystemColors::Highlight;
-			dataGridViewCellStyle5->SelectionForeColor = System::Drawing::SystemColors::HighlightText;
-			dataGridViewCellStyle5->WrapMode = System::Windows::Forms::DataGridViewTriState::False;
-			this->DBView->DefaultCellStyle = dataGridViewCellStyle5;
+			dataGridViewCellStyle2->ForeColor = System::Drawing::SystemColors::ControlText;
+			dataGridViewCellStyle2->SelectionBackColor = System::Drawing::SystemColors::Highlight;
+			dataGridViewCellStyle2->SelectionForeColor = System::Drawing::SystemColors::HighlightText;
+			dataGridViewCellStyle2->WrapMode = System::Windows::Forms::DataGridViewTriState::False;
+			this->DBView->DefaultCellStyle = dataGridViewCellStyle2;
 			this->DBView->Location = System::Drawing::Point(8, 99);
 			this->DBView->Name = L"DBView";
 			this->DBView->ReadOnly = true;
@@ -579,6 +562,26 @@ namespace CppCLRWinFormsProject {
 			this->DBView->TabIndex = 0;
 			this->DBView->CellContentClick += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &Form1::dataGridView1_CellContentClick);
 			this->DBView->CellValueChanged += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &Form1::DBView_CellValueChanged);
+			// 
+			// editCheckBox
+			// 
+			this->editCheckBox->AutoSize = true;
+			this->editCheckBox->Location = System::Drawing::Point(3, 17);
+			this->editCheckBox->Name = L"editCheckBox";
+			this->editCheckBox->Size = System::Drawing::Size(74, 20);
+			this->editCheckBox->TabIndex = 14;
+			this->editCheckBox->Text = L"Edición";
+			this->editCheckBox->UseVisualStyleBackColor = true;
+			this->editCheckBox->CheckedChanged += gcnew System::EventHandler(this, &Form1::checkBox1_CheckedChanged);
+			// 
+			// cambiosLabel
+			// 
+			this->cambiosLabel->AutoSize = true;
+			this->cambiosLabel->Location = System::Drawing::Point(0, 156);
+			this->cambiosLabel->Name = L"cambiosLabel";
+			this->cambiosLabel->Size = System::Drawing::Size(92, 16);
+			this->cambiosLabel->TabIndex = 13;
+			this->cambiosLabel->Text = L"SIN CAMBIOS";
 			// 
 			// cbConnection
 			// 
@@ -647,6 +650,16 @@ namespace CppCLRWinFormsProject {
 			this->groupBox6->Size = System::Drawing::Size(343, 178);
 			this->groupBox6->TabIndex = 16;
 			this->groupBox6->TabStop = false;
+			// 
+			// button3
+			// 
+			this->button3->Location = System::Drawing::Point(1532, 477);
+			this->button3->Name = L"button3";
+			this->button3->Size = System::Drawing::Size(209, 39);
+			this->button3->TabIndex = 16;
+			this->button3->Text = L"Eliminar Fila";
+			this->button3->UseVisualStyleBackColor = true;
+			this->button3->Click += gcnew System::EventHandler(this, &Form1::button3_Click_2);
 			// 
 			// Form1
 			// 
@@ -954,6 +967,15 @@ private: System::Void button3_Click_1(System::Object^ sender, System::EventArgs^
 	System::Diagnostics::Process::Start(url);
 }
 private: System::Void comboBox1_SelectedIndexChanged_1(System::Object^ sender, System::EventArgs^ e) {
+}
+private: System::Void button3_Click_2(System::Object^ sender, System::EventArgs^ e) {
+	//Lógica para eliminar una fila de la base de datos al tenerla seleccionada
+	/*
+	Marcar la fila que el usuario seleccione
+	Encontrar la columna de la llave primaria de esa tabla
+	Buscar el valor de la celda de la llave primaria en la fila seleccionada
+	mandar el MySqlCommand para eliminar el registro con la llave primaria
+	*/
 }
 };
 
