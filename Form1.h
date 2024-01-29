@@ -24,6 +24,10 @@ namespace CppCLRWinFormsProject {
 	{
 	public: 
 		List<array<List<String^>^>^>^ ALLrowsControlList = gcnew List<array<List<String^>^>^>();
+		const int BLANKROW = 1;
+
+
+
 		//Credencial de usuario para inicio de sesion
 		System::String^ usuario = "usuario";
 		//Marcadores booleanos para cargar los datos dependiendo de su estatus
@@ -837,14 +841,17 @@ private: System::Void DBView_CellValueChanged(System::Object^ sender, System::Wi
 private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
 	MySqlConnection^ conn = gcnew MySqlConnection(comboBox2->Text->ToString());
 	List<Tuple<int, int>^>^ errorCells = gcnew List<Tuple<int, int>^>();
+	List<Tuple<int, int>^>^ primaryCells = gcnew List<Tuple<int, int>^>();
+	
 	try {
 		conn->Open();
 		cbConnection->SetItemChecked(0, true);
 		//Si no se añadieron filas, modificar los datos
 
-		if (DBView->Rows->Count == dataTableCopy->Rows->Count) {
+		if ((DBView->Rows->Count - BLANKROW) == dataTableCopy->Rows->Count) {
 			for (unsigned int i = 0; i < modifiedCells->Count; i++) {
 				if (systemString2std(lbColumns->SelectedItem->ToString()) == "Todo") {
+					MessageBox::Show(modifiedCells[i]->Item1 + " , " + modifiedCells[i]->Item2);
 					MySqlDataAdapter^ adapter = gcnew MySqlDataAdapter("SELECT * FROM " + cbTables->Text->ToString(), conn);
 					MySqlCommand^ commandShowKeys = gcnew MySqlCommand("SHOW KEYS FROM " + cbTables->Text->ToString() + " WHERE Key_name = 'PRIMARY';", conn);
 					MySqlDataReader^ readerShowKeys = commandShowKeys->ExecuteReader();
@@ -853,16 +860,26 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 						primaryKeyIndex = safe_cast<UInt32>(readerShowKeys["Seq_in_index"]) - 1;
 					}
 					readerShowKeys->Close();
+					if (modifiedCells[i]->Item2 != primaryKeyIndex) {
+						//Regresar la modificación del valor de la llave primaria a la llave primaria original para la ejecución correcta del comando MySQL
+						MySqlCommand^ commandUpdate = gcnew MySqlCommand("UPDATE " + cbTables->Text->ToString() + " SET " + DBView->Columns[modifiedCells[i]->Item2]->Name->ToString() + " = " + " ' " + DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Value + " ' " + " WHERE " + DBView->Columns[primaryKeyIndex]->Name->ToString() + " = " + DBView->Rows[modifiedCells[i]->Item1]->Cells[primaryKeyIndex]->Value + " ; ", conn);
+						DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Style->BackColor = Color::LightGreen;
+						commandUpdate->ExecuteNonQuery();
+					}
+					if (modifiedCells[i]->Item2 == primaryKeyIndex) {
+						DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Style->BackColor = Color::White;
+						MessageBox::Show("La llave primaria " + DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Value + " de la celda " + "( " + modifiedCells[i]->Item1 + " , " + modifiedCells[i]->Item2 + " ) no es modificable", "INFO", MessageBoxButtons::OK, MessageBoxIcon::Information);
+						Tuple<int, int>^ primaryCell = gcnew Tuple<int, int>(modifiedCells[i]->Item1, modifiedCells[i]->Item2);
+						primaryCells->Add(primaryCell);
+					}
 					//Si borra el valor de la llave primaria, eliminar la fila
 					//Lógica para añadir filas
 					/*Comparar el numero de filas del dataTable que es el source del DataGridView con la copia que se hace cada vez que se llama a la base de datos
 					deespués iterar las filas extra (añadidas) y poner el comando insert (Para no delimitar que deban poner todos los valores de la fila iterar también
 					las columnas que no tengan un valor nulo en la fila para así obtener sus nombres y añadirlos en el query) "INSERT INTO nuevasTablas[columna]->nombre VALUES (nuevasCeldas->Value)"*/
-					MySqlCommand^ commandUpdate = gcnew MySqlCommand("UPDATE " + cbTables->Text->ToString() + " SET " + DBView->Columns[modifiedCells[i]->Item2]->Name->ToString() + " = " + " ' " + DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Value + " ' " + " WHERE " + DBView->Columns[primaryKeyIndex]->Name->ToString() + " = " + DBView->Rows[modifiedCells[i]->Item1]->Cells[primaryKeyIndex]->Value + " ; ", conn);
-					DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Style->BackColor = Color::LightGreen;
-					commandUpdate->ExecuteNonQuery();
-
+					
 				}
+
 				else {
 					MessageBox::Show("La modificación de valores solo está disponible mientras se muestra la tabla completa", "INFO", MessageBoxButtons::OK, MessageBoxIcon::Information);
 					cambiosLabel->Text = "SIN CAMBIOS";
@@ -872,6 +889,9 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 					modifiedCells->Clear();
 				}
 			}
+			for (unsigned int k = 0; k < primaryCells->Count; k++) {
+				DBView->Rows[primaryCells[k]->Item1]->Cells[primaryCells[k]->Item2]->Style->BackColor = Color::White;
+			}
 			cambiosLabel->Text = "CAMBIOS GUARDADOS";
 			cambiosLabel->ForeColor = Color::Green;
 			DBView->BackColor = Color::White;
@@ -879,7 +899,7 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 			modifiedCells->Clear();
 		}
 		//Si el numero de filas del DBView es mayor al de la tabla en la base de datos se llega a este punto
-		else if (DBView->Rows->Count > dataTableCopy->Rows->Count){
+		else if ((DBView->Rows->Count - BLANKROW) > dataTableCopy->Rows->Count){
 			if (systemString2std(lbColumns->SelectedItem->ToString()) == "Todo") {
 				//Iteramos las filas añadidas
 				for (unsigned int i = 0; i < (DBView->Rows->Count - dataTableCopy->Rows->Count); i++) {
