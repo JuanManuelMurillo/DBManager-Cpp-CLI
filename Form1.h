@@ -3,6 +3,7 @@
 #include <tchar.h>
 #include <vcclr.h> 
 #include <vector>
+#include <array>
 namespace CppCLRWinFormsProject {
 
 	using namespace System;
@@ -22,10 +23,19 @@ namespace CppCLRWinFormsProject {
 	public ref class Form1 : public System::Windows::Forms::Form
 	{
 	public: 
+		List<array<List<String^>^>^>^ ALLrowsControlList = gcnew List<array<List<String^>^>^>();
+		const int BLANKROW = 1;
+
+
+
+		//Credencial de usuario para inicio de sesion
 		System::String^ usuario = "usuario";
+		//Marcadores booleanos para cargar los datos dependiendo de su estatus
 		bool dataChanged;
 		bool ableToDelete;
+		//Copia de la tabla recuperada de la base de datos para control
 		DataTable^ dataTableCopy = gcnew DataTable();
+		//Lista para guardar la posicion de las celdas que el usuario modifique
 		List<Tuple<int, int>^>^ modifiedCells = gcnew List<Tuple<int, int>^>();
 		
 	private: System::Windows::Forms::GroupBox^ groupBox4;
@@ -35,10 +45,8 @@ namespace CppCLRWinFormsProject {
 	private: System::Windows::Forms::GroupBox^ groupBox5;
 	private: System::Windows::Forms::Button^ bClearDBView;
 
-
-
-
 	public:
+		//Credencial de la contraseña para el inicio de sesion
 		System::String^ contrasenia = "contraseña";
 	private: System::Windows::Forms::TextBox^ textBox1;
 	public:
@@ -57,15 +65,9 @@ namespace CppCLRWinFormsProject {
 	private: System::Windows::Forms::CheckBox^ editCheckBox;
 	private: System::Windows::Forms::Button^ helpButton;
 	private: System::Windows::Forms::GroupBox^ groupBox6;
+	private: System::Windows::Forms::Button^ button3;
 
-
-
-
-
-
-
-
-
+		   //Marcador para conocer el status del log in del usuairo
 		   bool logIn;
 
 	public:
@@ -96,6 +98,8 @@ namespace CppCLRWinFormsProject {
 	private: System::Windows::Forms::TextBox^ tbUsuario;
 	private: System::Windows::Forms::TextBox^ tbContraseña;
 	private: DataColumnCollection^ columnas;
+
+		   //Metodo para consultar la base de datos, crear un DataTable para la visualizacion de datos en el DataGridView
 		void LoadDataFromDB(String^ columns, String^ table) {
 			String^ connectionString = comboBox2->Text->ToString();
 			MySqlConnection^ conn = gcnew MySqlConnection(connectionString);
@@ -104,15 +108,17 @@ namespace CppCLRWinFormsProject {
 				conn->Open();
 				DataTable^ tableSchema = conn->GetSchema("Tables");
 				DataTable^ dataTable = gcnew DataTable();
-				
+				//Recuperar la tabla seleccionada de la base
 				if (systemString2std(columns) == "Todo") {
 					MySqlDataAdapter^ adapter = gcnew MySqlDataAdapter("SELECT * FROM "+ table, conn);
 					adapter->Fill(dataTable);
+					dataTableCopy->Clear();
 					adapter->Fill(dataTableCopy);
 				}
 				else {
 					MySqlDataAdapter^ adapter = gcnew MySqlDataAdapter("SELECT "+ columns +" FROM "+table, conn);
 					adapter->Fill(dataTable);
+					dataTableCopy->Clear();
 					adapter->Fill(dataTableCopy);
 				}
 				cbConnection->SetItemChecked(0, true);
@@ -154,6 +160,7 @@ namespace CppCLRWinFormsProject {
 		}
 
 	private:
+		//Funcion para conectarse a la base de datos
 		void connectDataBase() {
 			String^ connectionString = comboBox2->Text->ToString();
 			MySqlConnection^ conn = gcnew MySqlConnection(connectionString);
@@ -183,10 +190,10 @@ namespace CppCLRWinFormsProject {
 			}
 		}
 	private: 
+		//Funcion para consultar la base de datos y conocer los nombres de la tabla para la consulta del usuario
 		void fillColumns() {
 			if (! System::String::IsNullOrEmpty(cbTables->Text->ToString())) {
 				String^ table = cbTables->SelectedItem->ToString();
-				//String^ table = cbTables->Text->ToString();
 				String^ connectionString = comboBox2->Text->ToString();
 				MySqlConnection^ conn = gcnew MySqlConnection(connectionString);
 				conn->Open();
@@ -250,7 +257,7 @@ namespace CppCLRWinFormsProject {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			System::Windows::Forms::DataGridViewCellStyle^ dataGridViewCellStyle5 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
+			System::Windows::Forms::DataGridViewCellStyle^ dataGridViewCellStyle1 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
 			this->lbUsuario = (gcnew System::Windows::Forms::Label());
 			this->lbContrasenia = (gcnew System::Windows::Forms::Label());
 			this->botonIngreso = (gcnew System::Windows::Forms::Button());
@@ -265,9 +272,8 @@ namespace CppCLRWinFormsProject {
 			this->lbColumns = (gcnew System::Windows::Forms::ListBox());
 			this->button1 = (gcnew System::Windows::Forms::Button());
 			this->groupBox4 = (gcnew System::Windows::Forms::GroupBox());
+			this->button3 = (gcnew System::Windows::Forms::Button());
 			this->helpButton = (gcnew System::Windows::Forms::Button());
-			this->editCheckBox = (gcnew System::Windows::Forms::CheckBox());
-			this->cambiosLabel = (gcnew System::Windows::Forms::Label());
 			this->groupBox5 = (gcnew System::Windows::Forms::GroupBox());
 			this->button2 = (gcnew System::Windows::Forms::Button());
 			this->comboBox1 = (gcnew System::Windows::Forms::ComboBox());
@@ -275,6 +281,8 @@ namespace CppCLRWinFormsProject {
 			this->bClearDBView = (gcnew System::Windows::Forms::Button());
 			this->bAceptar = (gcnew System::Windows::Forms::Button());
 			this->DBView = (gcnew System::Windows::Forms::DataGridView());
+			this->editCheckBox = (gcnew System::Windows::Forms::CheckBox());
+			this->cambiosLabel = (gcnew System::Windows::Forms::Label());
 			this->cbConnection = (gcnew System::Windows::Forms::CheckedListBox());
 			this->ConnectDBButton = (gcnew System::Windows::Forms::Button());
 			this->comboBox2 = (gcnew System::Windows::Forms::ComboBox());
@@ -411,8 +419,7 @@ namespace CppCLRWinFormsProject {
 			// 
 			// cbTables
 			// 
-			this->cbTables->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(219)), static_cast<System::Int32>(static_cast<System::Byte>(219)),
-				static_cast<System::Int32>(static_cast<System::Byte>(219)));
+			this->cbTables->BackColor = System::Drawing::Color::White;
 			this->cbTables->FormattingEnabled = true;
 			this->cbTables->Location = System::Drawing::Point(6, 37);
 			this->cbTables->Name = L"cbTables";
@@ -451,6 +458,7 @@ namespace CppCLRWinFormsProject {
 			// 
 			// groupBox4
 			// 
+			this->groupBox4->Controls->Add(this->button3);
 			this->groupBox4->Controls->Add(this->helpButton);
 			this->groupBox4->Controls->Add(this->groupBox5);
 			this->groupBox4->Controls->Add(this->bClearDBView);
@@ -465,6 +473,18 @@ namespace CppCLRWinFormsProject {
 			this->groupBox4->Text = L"Datos";
 			this->groupBox4->Enter += gcnew System::EventHandler(this, &Form1::groupBox4_Enter);
 			// 
+			// button3
+			// 
+			this->button3->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(128)), static_cast<System::Int32>(static_cast<System::Byte>(162)),
+				static_cast<System::Int32>(static_cast<System::Byte>(150)));
+			this->button3->Location = System::Drawing::Point(1530, 443);
+			this->button3->Name = L"button3";
+			this->button3->Size = System::Drawing::Size(209, 39);
+			this->button3->TabIndex = 16;
+			this->button3->Text = L"Eliminar Fila";
+			this->button3->UseVisualStyleBackColor = false;
+			this->button3->Click += gcnew System::EventHandler(this, &Form1::button3_Click_2);
+			// 
 			// helpButton
 			// 
 			this->helpButton->Location = System::Drawing::Point(1711, 569);
@@ -474,26 +494,6 @@ namespace CppCLRWinFormsProject {
 			this->helpButton->Text = L"\?";
 			this->helpButton->UseVisualStyleBackColor = true;
 			this->helpButton->Click += gcnew System::EventHandler(this, &Form1::button3_Click_1);
-			// 
-			// editCheckBox
-			// 
-			this->editCheckBox->AutoSize = true;
-			this->editCheckBox->Location = System::Drawing::Point(3, 17);
-			this->editCheckBox->Name = L"editCheckBox";
-			this->editCheckBox->Size = System::Drawing::Size(74, 20);
-			this->editCheckBox->TabIndex = 14;
-			this->editCheckBox->Text = L"Edición";
-			this->editCheckBox->UseVisualStyleBackColor = true;
-			this->editCheckBox->CheckedChanged += gcnew System::EventHandler(this, &Form1::checkBox1_CheckedChanged);
-			// 
-			// cambiosLabel
-			// 
-			this->cambiosLabel->AutoSize = true;
-			this->cambiosLabel->Location = System::Drawing::Point(0, 156);
-			this->cambiosLabel->Name = L"cambiosLabel";
-			this->cambiosLabel->Size = System::Drawing::Size(92, 16);
-			this->cambiosLabel->TabIndex = 13;
-			this->cambiosLabel->Text = L"SIN CAMBIOS";
 			// 
 			// groupBox5
 			// 
@@ -521,8 +521,7 @@ namespace CppCLRWinFormsProject {
 			// 
 			// comboBox1
 			// 
-			this->comboBox1->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(219)), static_cast<System::Int32>(static_cast<System::Byte>(219)),
-				static_cast<System::Int32>(static_cast<System::Byte>(219)));
+			this->comboBox1->BackColor = System::Drawing::Color::White;
 			this->comboBox1->FormattingEnabled = true;
 			this->comboBox1->Location = System::Drawing::Point(13, 18);
 			this->comboBox1->Name = L"comboBox1";
@@ -542,7 +541,7 @@ namespace CppCLRWinFormsProject {
 			// 
 			this->bClearDBView->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(128)), static_cast<System::Int32>(static_cast<System::Byte>(162)),
 				static_cast<System::Int32>(static_cast<System::Byte>(150)));
-			this->bClearDBView->Location = System::Drawing::Point(1532, 338);
+			this->bClearDBView->Location = System::Drawing::Point(1530, 267);
 			this->bClearDBView->Name = L"bClearDBView";
 			this->bClearDBView->Size = System::Drawing::Size(211, 101);
 			this->bClearDBView->TabIndex = 3;
@@ -570,15 +569,15 @@ namespace CppCLRWinFormsProject {
 				static_cast<System::Int32>(static_cast<System::Byte>(76)));
 			this->DBView->BorderStyle = System::Windows::Forms::BorderStyle::None;
 			this->DBView->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
-			dataGridViewCellStyle5->Alignment = System::Windows::Forms::DataGridViewContentAlignment::MiddleLeft;
-			dataGridViewCellStyle5->BackColor = System::Drawing::Color::White;
-			dataGridViewCellStyle5->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 7.8F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			dataGridViewCellStyle1->Alignment = System::Windows::Forms::DataGridViewContentAlignment::MiddleLeft;
+			dataGridViewCellStyle1->BackColor = System::Drawing::Color::White;
+			dataGridViewCellStyle1->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 7.8F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
-			dataGridViewCellStyle5->ForeColor = System::Drawing::SystemColors::ControlText;
-			dataGridViewCellStyle5->SelectionBackColor = System::Drawing::SystemColors::Highlight;
-			dataGridViewCellStyle5->SelectionForeColor = System::Drawing::SystemColors::HighlightText;
-			dataGridViewCellStyle5->WrapMode = System::Windows::Forms::DataGridViewTriState::False;
-			this->DBView->DefaultCellStyle = dataGridViewCellStyle5;
+			dataGridViewCellStyle1->ForeColor = System::Drawing::SystemColors::ControlText;
+			dataGridViewCellStyle1->SelectionBackColor = System::Drawing::SystemColors::Highlight;
+			dataGridViewCellStyle1->SelectionForeColor = System::Drawing::SystemColors::HighlightText;
+			dataGridViewCellStyle1->WrapMode = System::Windows::Forms::DataGridViewTriState::False;
+			this->DBView->DefaultCellStyle = dataGridViewCellStyle1;
 			this->DBView->Location = System::Drawing::Point(8, 99);
 			this->DBView->Name = L"DBView";
 			this->DBView->ReadOnly = true;
@@ -588,6 +587,26 @@ namespace CppCLRWinFormsProject {
 			this->DBView->TabIndex = 0;
 			this->DBView->CellContentClick += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &Form1::dataGridView1_CellContentClick);
 			this->DBView->CellValueChanged += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &Form1::DBView_CellValueChanged);
+			// 
+			// editCheckBox
+			// 
+			this->editCheckBox->AutoSize = true;
+			this->editCheckBox->Location = System::Drawing::Point(3, 17);
+			this->editCheckBox->Name = L"editCheckBox";
+			this->editCheckBox->Size = System::Drawing::Size(74, 20);
+			this->editCheckBox->TabIndex = 14;
+			this->editCheckBox->Text = L"Edición";
+			this->editCheckBox->UseVisualStyleBackColor = true;
+			this->editCheckBox->CheckedChanged += gcnew System::EventHandler(this, &Form1::checkBox1_CheckedChanged);
+			// 
+			// cambiosLabel
+			// 
+			this->cambiosLabel->AutoSize = true;
+			this->cambiosLabel->Location = System::Drawing::Point(0, 156);
+			this->cambiosLabel->Name = L"cambiosLabel";
+			this->cambiosLabel->Size = System::Drawing::Size(92, 16);
+			this->cambiosLabel->TabIndex = 13;
+			this->cambiosLabel->Text = L"SIN CAMBIOS";
 			// 
 			// cbConnection
 			// 
@@ -615,8 +634,7 @@ namespace CppCLRWinFormsProject {
 			// 
 			// comboBox2
 			// 
-			this->comboBox2->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(219)), static_cast<System::Int32>(static_cast<System::Byte>(219)),
-				static_cast<System::Int32>(static_cast<System::Byte>(219)));
+			this->comboBox2->BackColor = System::Drawing::Color::White;
 			this->comboBox2->FormattingEnabled = true;
 			this->comboBox2->Items->AddRange(gcnew cli::array< System::Object^  >(1) { L"datasource=localhost; username=root; password=password; database=ESR_DB" });
 			this->comboBox2->Location = System::Drawing::Point(6, 43);
@@ -673,7 +691,7 @@ namespace CppCLRWinFormsProject {
 			this->Cursor = System::Windows::Forms::Cursors::Default;
 			this->HelpButton = true;
 			this->Name = L"Form1";
-			this->Text = L"Visor de Base de Datos";
+			this->Text = L"DBManager";
 			this->Load += gcnew System::EventHandler(this, &Form1::Form1_Load);
 			this->groupBox1->ResumeLayout(false);
 			this->groupBox1->PerformLayout();
@@ -696,7 +714,8 @@ namespace CppCLRWinFormsProject {
 	private: System::Void label3_Click(System::Object^ sender, System::EventArgs^ e) {
 	}
 		   
-
+		   
+	//Evento del boton de LogIn para validar las credenciales
 	private: System::Void botonIngreso_Click(System::Object^ sender, System::EventArgs^ e) {
 		std::string usuario = "usuario";
 		std::string contrasenia = "contraseña";
@@ -789,10 +808,6 @@ private: System::Void bClearDBView_Click(System::Object^ sender, System::EventAr
 	
 }
 private: System::Void textBox1_TextChanged(System::Object^ sender, System::EventArgs^ e) {
-	
-	
-	
-	//dataTable->DefaultView->RowFilter = System::String::Format("[{0}] LIKE '%{1}%'", columnas[0]->ColumnName, textBox1->Text);
 }
 private: System::Void label1_Click_1(System::Object^ sender, System::EventArgs^ e) {
 }
@@ -806,19 +821,17 @@ private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e
 
 }
 private: System::Void ConnectDBButton_Click(System::Object^ sender, System::EventArgs^ e) {
-	//System::String^ connectionString = connectionTB->Text->ToString();
-	//MySqlConnection^ conn = gcnew MySqlConnection(connectionString);
 	if (logIn) {
 		connectDataBase();
 	}
-	
-	
 }
 private: System::Void button3_Click(System::Object^ sender, System::EventArgs^ e) {
 	fillColumns();
 }
 private: System::Void DBView_CellBeginEdit(System::Object^ sender, System::Windows::Forms::DataGridViewCellCancelEventArgs^ e) {
 }
+//Cuando el usuario cambie el valor de la celda, se va a guardar su posicíon y marcar en amarillo para que el usuario
+//logre identificar los valores modificados y se guarden en la lista para guardarlos posteriormente
 private: System::Void DBView_CellValueChanged(System::Object^ sender, System::Windows::Forms::DataGridViewCellEventArgs^ e) {
 	Tuple<int, int>^ cellKey = Tuple::Create(e->RowIndex, e->ColumnIndex);
 	modifiedCells->Add(cellKey);
@@ -831,11 +844,15 @@ private: System::Void DBView_CellValueChanged(System::Object^ sender, System::Wi
 private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
 	MySqlConnection^ conn = gcnew MySqlConnection(comboBox2->Text->ToString());
 	List<Tuple<int, int>^>^ errorCells = gcnew List<Tuple<int, int>^>();
+	List<Tuple<int, int>^>^ primaryCells = gcnew List<Tuple<int, int>^>();
+
+	
 	try {
 		conn->Open();
 		cbConnection->SetItemChecked(0, true);
+		//Si no se añadieron filas, modificar los datos
 
-		if (DBView->Rows->Count == dataTableCopy->Rows->Count) {
+		if ((DBView->Rows->Count - BLANKROW) == dataTableCopy->Rows->Count && modifiedCells->Count > 0) {
 			for (unsigned int i = 0; i < modifiedCells->Count; i++) {
 				if (systemString2std(lbColumns->SelectedItem->ToString()) == "Todo") {
 					MySqlDataAdapter^ adapter = gcnew MySqlDataAdapter("SELECT * FROM " + cbTables->Text->ToString(), conn);
@@ -846,41 +863,122 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 						primaryKeyIndex = safe_cast<UInt32>(readerShowKeys["Seq_in_index"]) - 1;
 					}
 					readerShowKeys->Close();
-					//Si borra el valor de la llave primaria, eliminar la fila
-					//Lógica para añadir filas
-					/*Comparar el numero de filas del dataTable que es el source del DataGridView con la copia que se hace cada vez que se llama a la base de datos
-					deespués iterar las filas extra (añadidas) y poner el comando insert (Para no delimitar que deban poner todos los valores de la fila iterar también
-					las columnas que no tengan un valor nulo en la fila para así obtener sus nombres y añadirlos en el query) "INSERT INTO nuevasTablas[columna]->nombre VALUES (nuevasCeldas->Value)"*/
-					MySqlCommand^ commandUpdate = gcnew MySqlCommand("UPDATE " + cbTables->Text->ToString() + " SET " + DBView->Columns[modifiedCells[i]->Item2]->Name->ToString() + " = " + " ' " + DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Value + " ' " + " WHERE " + DBView->Columns[primaryKeyIndex]->Name->ToString() + " = " + DBView->Rows[modifiedCells[i]->Item1]->Cells[primaryKeyIndex]->Value + " ; ", conn);
-					DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Style->BackColor = Color::LightGreen;
-					commandUpdate->ExecuteNonQuery();
-
+					if (modifiedCells[i]->Item2 != primaryKeyIndex) {
+						//Regresar la modificación del valor de la llave primaria a la llave primaria original para la ejecución correcta del comando MySQL
+						int pRowIndex = DBView->Rows[modifiedCells[i]->Item1]->Index;
+						DataRow^ row2modify = dataTableCopy->Rows[modifiedCells[i]->Item1];
+						String^ pKey = row2modify[primaryKeyIndex]->ToString();
+						MySqlCommand^ commandUpdate = gcnew MySqlCommand("UPDATE " + cbTables->Text->ToString() + " SET " + DBView->Columns[modifiedCells[i]->Item2]->Name->ToString() + " = " + " ' " + DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Value + " ' " + " WHERE " + DBView->Columns[primaryKeyIndex]->Name->ToString() + " = " + pKey + " ; ", conn);
+						DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Style->BackColor = Color::LightGreen;
+						commandUpdate->ExecuteNonQuery();
+					}
+					if (modifiedCells[i]->Item2 == primaryKeyIndex) {
+						DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Style->BackColor = Color::White;
+						MessageBox::Show("La llave primaria " + DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Value + " de la celda " + "( " + modifiedCells[i]->Item1 + " , " + modifiedCells[i]->Item2 + " ) no es modificable", "INFO", MessageBoxButtons::OK, MessageBoxIcon::Information);
+						Tuple<int, int>^ primaryCell = gcnew Tuple<int, int>(modifiedCells[i]->Item1, modifiedCells[i]->Item2);
+						primaryCells->Add(primaryCell);
+					}
+					
 				}
 				else {
+					MessageBox::Show("La modificación de valores solo está disponible mientras se muestra la tabla completa", "INFO", MessageBoxButtons::OK, MessageBoxIcon::Information);
+					cambiosLabel->Text = "SIN CAMBIOS";
+					cambiosLabel->ForeColor = Color::Black;
+					DBView->BackColor = Color::White;
+					dataChanged = false;
+					modifiedCells->Clear();
 				}
+			}
+			for (unsigned int k = 0; k < primaryCells->Count; k++) {
+				DBView->Rows[primaryCells[k]->Item1]->Cells[primaryCells[k]->Item2]->Style->BackColor = Color::White;
 			}
 			cambiosLabel->Text = "CAMBIOS GUARDADOS";
 			cambiosLabel->ForeColor = Color::Green;
 			DBView->BackColor = Color::White;
 			dataChanged = false;
 			modifiedCells->Clear();
+			MessageBox::Show("Los cambios se han guardado con éxito", "Cambios", MessageBoxButtons::OK, MessageBoxIcon::Information);
+			LoadDataFromDB(lbColumns->SelectedItem->ToString(), cbTables->SelectedItem->ToString());
 		}
 		//Si el numero de filas del DBView es mayor al de la tabla en la base de datos se llega a este punto
-		else if (DBView->Rows->Count > dataTableCopy->Rows->Count)
-		{
-			MessageBox::Show("Se añadieron filas", "INFO", MessageBoxButtons::OK, MessageBoxIcon::Information);
+		else if ((DBView->Rows->Count - BLANKROW) > dataTableCopy->Rows->Count){
+			if (systemString2std(lbColumns->SelectedItem->ToString()) == "Todo") {
+				//Iteramos las filas añadidas
+				for (unsigned int i = 0; i < ((DBView->Rows->Count - 1) - dataTableCopy->Rows->Count); i++) {
+					//Creamos el array en el que guardaremos la información de la tabla, columnas y datos a ingresar en el MySqlCommand
+					array<List<String^>^>^ addedRowControlArray = gcnew array<List<String^>^> {gcnew List<String^>(), gcnew List<String^>(), gcnew List<String^>()};
+					addedRowControlArray[0]->Add(cbTables->Text->ToString());
+					//Iteramos todas las columnas de la tabla
+					for (unsigned int j = 0; j < DBView->Columns->Count; j++) {
+
+						//Si existe un valor en la fila, entonces añade la información de la fila al array de control
+						if (DBView->Rows[i + dataTableCopy->Rows->Count]->Cells[j]->Value != nullptr) {
+							DataGridViewColumn^ column = DBView->Columns[j];
+							addedRowControlArray[1]->Add(column->Name->ToString());
+							addedRowControlArray[2]->Add(DBView->Rows[i + dataTableCopy->Rows->Count]->Cells[j]->Value->ToString());
+						}
+					}
+					//Crear el String para ingresar al comando MySQL
+					System::Text::StringBuilder^ columnNames = gcnew System::Text::StringBuilder();
+					System::Text::StringBuilder^ values = gcnew System::Text::StringBuilder();
+					for (unsigned int k = 0; k < addedRowControlArray[1]->Count; k++) {
+						if (k == 0) {
+							columnNames->Append(addedRowControlArray[1][k]);
+							columnNames->Append(" , ");
+						}
+						else if (k < (addedRowControlArray[1]->Count - 1)) {
+							columnNames->Append(addedRowControlArray[1][k]);
+							columnNames->Append(" , ");
+						}
+						else {
+							columnNames->Append(addedRowControlArray[1][k]);
+						}
+						if (k == 0) {
+							values->Append("'");
+							values->Append(addedRowControlArray[2][k]);
+							values->Append("', ");
+						}
+						else if (k < (addedRowControlArray[2]->Count - 1)) {
+							values->Append("'");
+							values->Append(addedRowControlArray[2][k]);
+							values->Append("', ");
+						}
+						else {
+							values->Append("'");
+							values->Append(addedRowControlArray[2][k]);
+							values->Append("'");
+						}
+					}
+					MySqlCommand^ commmandAdd = gcnew MySqlCommand("INSERT INTO " + addedRowControlArray[0][0]->ToString() + "( " + columnNames->ToString() + " )" + " VALUES " + "( " + values->ToString() + " )", conn);
+					commmandAdd->ExecuteNonQuery();
+				}
+				cambiosLabel->ForeColor = Color::Green;
+				cambiosLabel->Text = "CAMBIOS GUARDADOS";
+				MessageBox::Show("Se añadieron las filas", "INFO", MessageBoxButtons::OK, MessageBoxIcon::Information);
+				LoadDataFromDB(lbColumns->SelectedItem->ToString(), cbTables->SelectedItem->ToString());
+				dataChanged = false;
+				modifiedCells->Clear();
+			}
+			else {
+				MessageBox::Show("La modificación de valores solo está disponible mientras se muestra la tabla completa", "INFO", MessageBoxButtons::OK, MessageBoxIcon::Information);
+				cambiosLabel->Text = "SIN CAMBIOS";
+				cambiosLabel->ForeColor = Color::Black;
+				DBView->BackColor = Color::White;
+				dataChanged = false;
+				modifiedCells->Clear();
+			}
 		}
-
-
 	}
 	catch (MySqlException^ ex) {
 		for (unsigned int i = 0; i < modifiedCells->Count; i++) {
 			DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Style->BackColor = Color::Red;
 		}
-		System::Windows::Forms::DialogResult result = MessageBox::Show("Error de MySQL: " + ex->Message + "\n" + "¿Desea descartar los cambios ? ", "Error / n ¿Desea descartar los cambios ? ", MessageBoxButtons::YesNo, MessageBoxIcon::Error);
+		System::Windows::Forms::DialogResult result = MessageBox::Show("Error de MySQL: " + ex->Message + "\n" + "¿Desea descartar los cambios ? ", "Error", MessageBoxButtons::YesNo, MessageBoxIcon::Error);
 		if (result == System::Windows::Forms::DialogResult::Yes) {
 			for (unsigned int i = 0; i < modifiedCells->Count; i++) {
 				DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Style->BackColor = Color::White;
+				cambiosLabel->Text = "SIN CAMBIOS";
+				cambiosLabel->ForeColor = Color::Black;
 			}
 			modifiedCells->Clear();
 		}
@@ -891,6 +989,8 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 		MessageBox::Show("Error: " + ex->Message, "Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
 	}
 	finally {
+		MySqlDataAdapter^ adapter = gcnew MySqlDataAdapter("SELECT * FROM " + cbTables->SelectedItem->ToString(), conn);
+		
 		conn->Close();
 
 	}
@@ -908,6 +1008,55 @@ private: System::Void button3_Click_1(System::Object^ sender, System::EventArgs^
 	System::Diagnostics::Process::Start(url);
 }
 private: System::Void comboBox1_SelectedIndexChanged_1(System::Object^ sender, System::EventArgs^ e) {
+}
+private: System::Void button3_Click_2(System::Object^ sender, System::EventArgs^ e) {
+	System::Windows::Forms::DialogResult confirmationDialog =  MessageBox::Show("¿Estás seguro de que quieres elimiar la fila seleccionada?", "Confirmación", MessageBoxButtons::YesNo, MessageBoxIcon::Warning);
+	if (confirmationDialog == System::Windows::Forms::DialogResult::Yes) {
+		if (DBView->SelectedRows->Count > 0) {
+			List<DataGridViewRow^>^ ListOfSelectedRows = gcnew List<DataGridViewRow^>;
+			//Llenar la lista de filas seleccionadas
+			for (int i = 0; i < DBView->SelectedRows->Count; i++) {
+				ListOfSelectedRows->Add(DBView->SelectedRows[i]);
+				MySqlConnection^ conn = gcnew MySqlConnection(comboBox2->Text->ToString());
+				try {
+					//Abrir la conexión con MySQL
+					conn->Open();
+					cbConnection->SetItemChecked(0, true);
+					//Encontrar el índice de la llave primaria
+					MySqlCommand^ commandShowKeys = gcnew MySqlCommand("SHOW KEYS FROM " + cbTables->Text->ToString() + " WHERE Key_name = 'PRIMARY';", conn);
+					MySqlDataReader^ readerShowKeys = commandShowKeys->ExecuteReader();
+					UInt32 primaryKeyIndex;
+					while (readerShowKeys->Read()) {
+						//Mapear el resultado ya que MySQL inicia los índices en 1 y C++ en 0
+						primaryKeyIndex = safe_cast<UInt32>(readerShowKeys["Seq_in_index"]) - 1;
+					}
+					readerShowKeys->Close();
+					String^ toDeleteValue = DBView->SelectedRows[i]->Cells[primaryKeyIndex]->Value->ToString();
+					MySqlCommand^ deleteCommand = gcnew MySqlCommand("DELETE FROM " + cbTables->Text->ToString() + " WHERE " + DBView->Columns[primaryKeyIndex]->Name->ToString() + " = " + toDeleteValue, conn);
+					deleteCommand->ExecuteNonQuery();
+					MessageBox::Show("Los cambios se han guardado con éxito", "Cambios", MessageBoxButtons::OK, MessageBoxIcon::Information);
+					LoadDataFromDB(lbColumns->SelectedItem->ToString(), cbTables->SelectedItem->ToString());
+				}
+				catch (MySqlException^ ex) {
+					System::Windows::Forms::DialogResult result = MessageBox::Show("Error de MySQL: " + ex->Message + "\n" + "¿Desea descartar los cambios? ", "Error", MessageBoxButtons::YesNo, MessageBoxIcon::Error);
+					if (result == System::Windows::Forms::DialogResult::Yes) {
+						for (unsigned int i = 0; i < modifiedCells->Count; i++) {
+							DBView->Rows[modifiedCells[i]->Item1]->Cells[modifiedCells[i]->Item2]->Style->BackColor = Color::White;
+							cambiosLabel->Text = "SIN CAMBIOS";
+							cambiosLabel->ForeColor = Color::Black;
+						}
+						modifiedCells->Clear();
+					}
+				}
+				catch (Exception^ ex) {
+					MessageBox::Show("Error: " + ex->Message, "Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
+				}
+				finally {
+					conn->Close();
+				}
+			}
+		}
+	}
 }
 };
 
